@@ -9,8 +9,8 @@ users:
       - ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQCPIIO8uY8oWIihDv0tCAbX6toyG1RYkaLZyfGD1L+I07K4CnwAVBSU+81vw3Yv5sN9tj2Ccve9kzEeCNMld2mDP/Tt7edkx2MCToVfVx+njqwY/XbMY9bfdRKJLhIoLavuVNLnnkSIXdtlGr3JF71hPHzBDMEo64ofPCQ8hPsGxL1u3efb12jcWcRhudKtv7Qh6cVE47Zj4xImfi6VlLqwzcKZ5oCqR/z1hLLL+/pS3eM5Qsor5wmAqNfH4+z5eE+pOkFm7a0Nkygv9jwXIqtJzFGKYDe6ciBD04pEovdvY0FTyiv2vksQOVgjtu2faG2Iv1HOG0JktCIwJ49OEgjT teacher-key
       - ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIHuiYmEZWGq3+UgYaRJrNbJhhgleyRpKBvY+WMbVoxQV
 ssh_pwauth: false
-disable_root: false    
-package_update: true 
+disable_root: false
+package_update: true
 packages:
   - unzip
   - gnupg
@@ -45,5 +45,3 @@ runcmd:
   - sudo systemctl start mongod
   - sudo mongosh < /home/ubuntu/mongodbuser.txt
   - sudo systemctl restart mongod
-  
-  mongodb://admin:1223334444@54.82.121.234:27017/?authSource=admin&readPreference=primary&ssl=false
