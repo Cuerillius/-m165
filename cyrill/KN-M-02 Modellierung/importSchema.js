@@ -1,12 +1,10 @@
 const { MongoClient } = require("mongodb");
 
-// Function to create collections with validation schemas
 async function createCollections() {
-  // Connect to MongoDB (assumes a local instance at default port)
-  const client = new MongoClient("mongodb://admin:1223334444@54.82.121.234:27017/?authSource=admin&readPreference=primary&ssl=false"); // Replace with your MongoDB connection string
+  const client = new MongoClient("mongodb://admin:1223334444@54.82.121.234:27017/?authSource=admin&readPreference=primary&ssl=false");
   try {
     await client.connect();
-    const db = client.db("scout_management"); // Choose your database name
+    const db = client.db("scout_management");
     console.log("Connected to MongoDB");
 
     // List of collections to drop and recreate
@@ -53,7 +51,7 @@ async function createCollections() {
             badges: {
               bsonType: "array",
               items: {
-                bsonType: "string", // Assuming Badge is just a string name
+                bsonType: "string",
                 description: "must be an array of strings (Badge names)",
               },
               description: "must be an array of strings and is required",
@@ -96,7 +94,7 @@ async function createCollections() {
                   scouts: {
                     bsonType: "array",
                     items: {
-                      bsonType: "objectId", // Assuming ScoutId is ObjectId
+                      bsonType: "objectId",
                       description: "scouts must be an array of ObjectIds (ScoutIds), referencing scouts collection",
                     },
                     description: "scouts must be an array of ObjectIds and is required",
@@ -116,7 +114,7 @@ async function createCollections() {
                   Participants: {
                     bsonType: "array",
                     items: {
-                      bsonType: "objectId", // Assuming scoutid is ObjectId
+                      bsonType: "objectId",
                       description: "Participants must be an array of ObjectIds (scoutid), referencing scouts collection",
                     },
                     description: "Participants must be an array of ObjectIds and is required",
