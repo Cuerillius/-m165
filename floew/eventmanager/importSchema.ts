@@ -1,9 +1,11 @@
-const { MongoClient } = require("mongodb");
+import { MongoClient } from "mongodb";
 
 // Function to create collections with validation schemas
 async function createCollections() {
   // Connect to MongoDB (assumes a local instance at default port)
-  const client = new MongoClient("mongodb://link");
+  const client = new MongoClient(
+    "mongodb://admin:!12345678!@51.107.25.23:27017"
+  );
   try {
     await client.connect();
     const db = client.db("event_management");
@@ -177,5 +179,4 @@ async function createCollections() {
   }
 }
 
-// Execute the function
-createCollections();
+export { createCollections };
