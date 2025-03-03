@@ -3,17 +3,16 @@ const { MongoClient } = require("mongodb");
 // Function to create collections with validation schemas
 async function createCollections() {
   // Connect to MongoDB (assumes a local instance at default port)
-  const client = new MongoClient("mongodb://admin:1223334444@54.82.121.234:27017/?authSource=admin&readPreference=primary&ssl=false"); // Replace 'link' with your MongoDB connection string
+  const client = new MongoClient("mongodb://admin:1223334444@54.82.121.234:27017/?authSource=admin&readPreference=primary&ssl=false"); // Replace with your MongoDB connection string
   try {
     await client.connect();
-    const db = client.db("scout_management"); // Database name
-
+    const db = client.db("scout_management"); // Choose your database name
     console.log("Connected to MongoDB");
 
     // List of collections to drop and recreate
     const collections = [
-      "hierarchical_units", // Combined collection
-      "scouts",        // Scouts collection remains separate
+      "troops",
+      "scouts",
     ];
 
     // Drop existing collections
@@ -32,12 +31,12 @@ async function createCollections() {
       }
     }
 
-    // 1. Create Scouts collection (same as before)
+    // 1. Create Scouts collection
     await db.createCollection("scouts", {
       validator: {
         $jsonSchema: {
           bsonType: "object",
-          required: ["firstname", "lastname"],
+          required: ["firstname", "lastname", "badges"],
           properties: {
             firstname: {
               bsonType: "string",
@@ -54,10 +53,10 @@ async function createCollections() {
             badges: {
               bsonType: "array",
               items: {
-                bsonType: "string",
-                description: "must be a string",
+                bsonType: "string", // Assuming Badge is just a string name
+                description: "must be an array of strings (Badge names)",
               },
-              description: "must be an array of strings",
+              description: "must be an array of strings and is required",
             },
           },
         },
@@ -67,92 +66,64 @@ async function createCollections() {
     });
     console.log("Created scouts collection");
 
-    // 2. Create Hierarchical Units collection (troops, groups, courses combined)
-    await db.createCollection("hierarchical_units", {
+    // 2. Create Troops collection
+    await db.createCollection("troops", {
       validator: {
         $jsonSchema: {
           bsonType: "object",
-          required: ["unitType", "name"], // Common required fields
+          required: ["Name", "Motto", "Groups", "availableCourse"],
           properties: {
-            unitType: {
-              bsonType: "string",
-              enum: ["troop", "group", "course"], // Allowed unit types
-              description: "must be a string and enum ['troop', 'group', 'course'] and is required",
-            },
-            name: {
+            Name: {
               bsonType: "string",
               description: "must be a string and is required",
             },
-            motto: { // Troop-specific
+            Motto: {
               bsonType: "string",
-              description: "must be a string if unitType is 'troop'",
+              description: "must be a string and is required",
             },
-            groups: { // Troop-specific, array of embedded group documents
+            Groups: {
               bsonType: "array",
               items: {
                 bsonType: "object",
-                required: ["name", "year", "groupLeader"], // Required fields for embedded group
+                required: ["Name", "Year", "GroupLeader", "scouts"],
                 properties: {
-                  name: { bsonType: "string" },
-                  year: { bsonType: "int" },
-                  groupLeader: { // Embedded Scout for groupLeader
-                    bsonType: "object",
-                    required: ["firstname", "lastname"],
-                    properties: {
-                      firstname: { bsonType: "string" },
-                      lastname: { bsonType: "string" },
-                      nickname: { bsonType: "string" },
-                      badges: { bsonType: "array", items: { bsonType: "string" } },
-                    },
+                  Name: { bsonType: "string", description: "Group Name must be a string and is required" },
+                  Year: { bsonType: "number", description: "Group Year must be a number and is required" },
+                  GroupLeader: {
+                    bsonType: "objectId",
+                    description: "GroupLeader must be an ObjectId (ScoutId) and is required, referencing scouts collection",
                   },
-                  scouts: { // Embedded Scouts for group members
+                  scouts: {
                     bsonType: "array",
                     items: {
-                      bsonType: "object",
-                      required: ["firstname", "lastname"],
-                      properties: {
-                        firstname: { bsonType: "string" },
-                        lastname: { bsonType: "string" },
-                        nickname: { bsonType: "string" },
-                        badges: { bsonType: "array", items: { bsonType: "string" } },
-                      },
+                      bsonType: "objectId", // Assuming ScoutId is ObjectId
+                      description: "scouts must be an array of ObjectIds (ScoutIds), referencing scouts collection",
                     },
+                    description: "scouts must be an array of ObjectIds and is required",
                   },
                 },
               },
-              description: "must be an array of embedded group objects if unitType is 'troop'",
+              description: "Groups must be an array of group objects and is required",
             },
-            availableCourses: { // Troop-specific, array of ObjectIds referencing courses
+            availableCourse: {
               bsonType: "array",
               items: {
-                bsonType: "objectId",
-                description: "must be an ObjectId referencing courses within this collection (hierarchical_units) if unitType is 'troop'",
+                bsonType: "object",
+                required: ["Name", "Badge", "Participants"],
+                properties: {
+                  Name: { bsonType: "string", description: "Course Name must be a string and is required" },
+                  Badge: { bsonType: "string", description: "Course Badge must be a string and is required" },
+                  Participants: {
+                    bsonType: "array",
+                    items: {
+                      bsonType: "objectId", // Assuming scoutid is ObjectId
+                      description: "Participants must be an array of ObjectIds (scoutid), referencing scouts collection",
+                    },
+                    description: "Participants must be an array of ObjectIds and is required",
+                  },
+                },
               },
-              description: "must be an array of ObjectIds referencing courses if unitType is 'troop'",
-            },
-            year: { // Group-specific
-              bsonType: "int",
-              description: "must be an integer if unitType is 'group'",
-            },
-            groupLeader: { // Group-specific, embedded Scout (already defined in groups.items.properties above)
-              bsonType: "object",
-              description: "must be an embedded Scout object if unitType is 'group'",
-            },
-            scouts: { // Group-specific, embedded Scouts (already defined in groups.items.properties above)
-              bsonType: "array",
-              description: "must be an array of embedded Scout objects if unitType is 'group'",
-            },
-            badge: { // Course-specific
-              bsonType: "string",
-              description: "must be a string if unitType is 'course'",
-            },
-            participants: { // Course-specific, array of ObjectIds referencing scouts
-              bsonType: "array",
-              items: {
-                bsonType: "objectId",
-                description: "must be an ObjectId referencing scouts collection if unitType is 'course'",
-              },
-              description: "must be an array of ObjectIds referencing scouts if unitType is 'course'",
+              description: "availableCourse must be an array of course objects and is required",
             },
           },
         },
@@ -160,7 +131,7 @@ async function createCollections() {
       validationLevel: "strict",
       validationAction: "error",
     });
-    console.log("Created hierarchical_units collection");
+    console.log("Created troops collection");
 
 
     console.log("All collections created with validation schemas");
