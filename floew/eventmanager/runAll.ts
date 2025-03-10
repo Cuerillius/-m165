@@ -1,7 +1,7 @@
 import { fillCollections } from "./fillSchema";
-import { queryCollections } from "./querySchema";
-import { updateCollections } from "./updateSchema";
-import { deleteCollections } from "./deleteSchema";
+import { queryCollections } from "./queryCollections";
+import { updateCollections } from "./updateCollections";
+import { deleteCollections } from "./deleteCollections";
 import { createCollections } from "./importSchema";
 
 async function runAll() {
@@ -27,4 +27,5 @@ async function runAll() {
   }
 }
 
+export { runAll };
 runAll().catch(console.error);

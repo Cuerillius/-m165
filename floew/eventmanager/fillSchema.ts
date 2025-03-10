@@ -20,9 +20,11 @@ async function fillCollections() {
     const eventManagerId2 = new ObjectId();
 
     // Sample data for organisations
+    const org1Id = new ObjectId();
+    const org2Id = new ObjectId();
     const organisations = [
       {
-        _id: organisationId1,
+        _id: org1Id,
         name: "Organisation 1",
         address: "Address 1",
         contact: {
@@ -32,7 +34,7 @@ async function fillCollections() {
         },
       },
       {
-        _id: organisationId2,
+        _id: org2Id,
         name: "Organisation 2",
         address: "Address 2",
         contact: {
@@ -44,16 +46,18 @@ async function fillCollections() {
     ];
 
     // Sample data for events
+    const event1Id = new ObjectId();
+    const event2Id = new ObjectId();
     const events = [
       {
-        _id: eventId1,
+        _id: event1Id,
         date: new Date(),
         title: "Event 1",
         description: "Description 1",
         signups: [],
       },
       {
-        _id: eventId2,
+        _id: event2Id,
         date: new Date(),
         title: "Event 2",
         description: "Description 2",
@@ -62,16 +66,18 @@ async function fillCollections() {
     ];
 
     // Sample data for signUpParticipants
+    const participant1Id = new ObjectId();
+    const participant2Id = new ObjectId();
     const signUpParticipants = [
       {
-        _id: signUpParticipantId1,
+        _id: participant1Id,
         legalName: "Participant 1",
         nickName: "Nick 1",
         note: "Note 1",
         attending: true,
       },
       {
-        _id: signUpParticipantId2,
+        _id: participant2Id,
         legalName: "Participant 2",
         nickName: "Nick 2",
         note: "Note 2",
@@ -79,16 +85,30 @@ async function fillCollections() {
       },
     ];
 
+    // Sample data for eventManagers
+    const eventManager1Id = new ObjectId();
+    const eventManager2Id = new ObjectId();
+    const eventManagers = [
+      {
+        _id: eventManager1Id,
+        organisation: org1Id,
+        events: [event1Id, event2Id],
+      },
+      {
+        _id: eventManager2Id,
+        organisation: org2Id,
+        events: [event1Id],
+      },
+    ];
+
     // Insert data into collections
     await db.collection("organisations").insertMany(organisations);
     console.log("Inserted organisations data");
 
-    const eventsResult = await db.collection("events").insertMany(events);
+    await db.collection("events").insertMany(events);
     console.log("Inserted events data");
 
-    const signUpParticipantsResult = await db
-      .collection("signUpParticipants")
-      .insertMany(signUpParticipants);
+    await db.collection("signUpParticipants").insertOne(signUpParticipants[0]);
     console.log("Inserted signUpParticipants data");
 
     // Get the _id of the inserted events

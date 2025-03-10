@@ -22,23 +22,16 @@ async function queryCollections() {
       organisations
     );
 
-    // 2. Retrieve data from events collection with date filter and OR conjunction, project excluding _id
-    const events = await db
+    // Retrieve data from events collection
+    const events = await db.collection("events").find().toArray();
+    console.log("Events:", events);
+
+    // select by regex
+    const eventsByTitle = await db
       .collection("events")
-      .find(
-        {
-          $or: [
-            { date: { $gte: new Date("2024-01-01") } },
-            { title: { $regex: "Event", $options: "i" } },
-          ],
-        },
-        { projection: { _id: 0, title: 1, description: 1 } }
-      )
+      .find({ title: { $regex: /Event/ } })
       .toArray();
-    console.log(
-      "Events (date filter, OR, and projection without _id):",
-      events
-    );
+    console.log("Events by title:", eventsByTitle);
 
     // 3. Retrieve data from signUpParticipants collection with AND conjunction
     const signUpParticipants = await db
