@@ -9,9 +9,20 @@ async function fillCollections() {
     await client.connect();
     const db = client.db("event_management");
 
+    // Declare ObjectIds
+    const organisationId1 = new ObjectId();
+    const organisationId2 = new ObjectId();
+    const eventId1 = new ObjectId();
+    const eventId2 = new ObjectId();
+    const signUpParticipantId1 = new ObjectId();
+    const signUpParticipantId2 = new ObjectId();
+    const eventManagerId1 = new ObjectId();
+    const eventManagerId2 = new ObjectId();
+
     // Sample data for organisations
     const organisations = [
       {
+        _id: organisationId1,
         name: "Organisation 1",
         address: "Address 1",
         contact: {
@@ -21,6 +32,7 @@ async function fillCollections() {
         },
       },
       {
+        _id: organisationId2,
         name: "Organisation 2",
         address: "Address 2",
         contact: {
@@ -34,12 +46,14 @@ async function fillCollections() {
     // Sample data for events
     const events = [
       {
+        _id: eventId1,
         date: new Date(),
         title: "Event 1",
         description: "Description 1",
         signups: [],
       },
       {
+        _id: eventId2,
         date: new Date(),
         title: "Event 2",
         description: "Description 2",
@@ -50,12 +64,14 @@ async function fillCollections() {
     // Sample data for signUpParticipants
     const signUpParticipants = [
       {
+        _id: signUpParticipantId1,
         legalName: "Participant 1",
         nickName: "Nick 1",
         note: "Note 1",
         attending: true,
       },
       {
+        _id: signUpParticipantId2,
         legalName: "Participant 2",
         nickName: "Nick 2",
         note: "Note 2",
@@ -79,18 +95,13 @@ async function fillCollections() {
     const eventIds = Object.values(eventsResult.insertedIds);
 
     // Sample data for eventManagers
-    const eventManagers = [
-      {
-        organisation: new ObjectId(), // Replace with actual ObjectId
-        events: eventIds,
-      },
-      {
-        organisation: new ObjectId(), // Replace with actual ObjectId
-        events: eventIds,
-      },
-    ];
+    const eventManagers = {
+      _id: eventManagerId1,
+      organisation: new ObjectId(), // Replace with actual ObjectId
+      events: eventIds,
+    };
 
-    await db.collection("eventManagers").insertMany(eventManagers);
+    await db.collection("eventManagers").insertOne(eventManagers);
     console.log("Inserted eventManagers data");
 
     console.log("All collections filled with sample data");

@@ -9,24 +9,43 @@ async function updateCollections() {
     await client.connect();
     const db = client.db("event_management");
 
-    // Update organisations collection
+    // Sample ObjectIds
+    const organisationIdToUpdate = new ObjectId();
+    const eventIdToUpdate1 = new ObjectId();
+    const eventIdToUpdate2 = new ObjectId();
+    const signUpParticipantIdToReplace = new ObjectId();
+
+    // 1. Update one organisation using updateOne with _id filter
     await db
       .collection("organisations")
-      .updateMany({}, { $set: { address: "Updated Address" } });
-    console.log("Updated organisations collection");
+      .updateOne(
+        { _id: organisationIdToUpdate },
+        { $set: { address: "Updated Address using updateOne" } }
+      );
+    console.log("Updated one organisation using updateOne");
 
-    // Update events collection
+    // 2. Update multiple events using updateMany with an OR conjunction
     await db
       .collection("events")
-      .updateMany({}, { $set: { description: "Updated Description" } });
-    console.log("Updated events collection");
+      .updateMany(
+        { $or: [{ _id: eventIdToUpdate1 }, { _id: eventIdToUpdate2 }] },
+        { $set: { description: "Updated Description using updateMany" } }
+      );
+    console.log("Updated multiple events using updateMany");
 
-    // Update signUpParticipants collection
+    // 3. Replace one signUpParticipant using replaceOne
     await db
       .collection("signUpParticipants")
-      .updateMany({}, { $set: { note: "Updated Note" } });
-    console.log("Updated signUpParticipants collection");
+      .replaceOne(
+        { _id: signUpParticipantIdToReplace },
+        { legalName: "Replaced Name", attending: true }
+      );
+    console.log("Replaced one signUpParticipant using replaceOne");
+    // 4. Update multiple participants using updateMany with OR condition on fields other than _id
 
+    console.log(
+      "Updated multiple participants using updateMany with OR condition"
+    );
     // Update eventManagers collection
     // Add a new event to the events array
     const newEventId = new ObjectId();

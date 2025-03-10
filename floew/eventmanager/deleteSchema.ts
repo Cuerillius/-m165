@@ -1,4 +1,4 @@
-import { MongoClient } from "mongodb";
+import { MongoClient, ObjectId } from "mongodb";
 
 async function deleteCollections() {
   const client = new MongoClient(
@@ -8,6 +8,23 @@ async function deleteCollections() {
   try {
     await client.connect();
     const db = client.db("event_management");
+
+    // Sample ObjectIds
+    const organisationIdToDelete = new ObjectId();
+    const eventIdToDelete1 = new ObjectId();
+    const eventIdToDelete2 = new ObjectId();
+
+    // Delete one organisation
+    await db
+      .collection("organisations")
+      .deleteOne({ _id: organisationIdToDelete });
+    console.log("Deleted one organisation");
+
+    // Delete multiple events
+    await db.collection("events").deleteMany({
+      $or: [{ _id: eventIdToDelete1 }, { _id: eventIdToDelete2 }],
+    });
+    console.log("Deleted multiple events");
 
     // Delete collections
     await db.collection("organisations").drop();
