@@ -5,6 +5,7 @@ const port = 3000;
 
 app.get("/metrics", (req: Request, res: Response) => {
   const randomNumber = Math.floor(Math.random() * 100) + 1;
+  res.setHeader("Content-Type", "text/plain");
   res.send(randomNumber.toString());
 });
 
